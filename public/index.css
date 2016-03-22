@@ -1,0 +1,10 @@
+.codemirror-container {
+    max-width: 720px;
+    border: 2px solid #ccc;
+}
+
+.estree-display-textarea {
+    display: block;
+    width: 400px;
+    height: 300px;
+}

@@ -4,6 +4,8 @@ import Codemirror from 'react-codemirror'
 import Esprima from 'esprima'
 import React from 'react'
 
+import RulesChecker from './RulesChecker'
+
 
 class MainController extends React.Component {
     state = {
@@ -40,16 +42,25 @@ class MainController extends React.Component {
                     value={estreeValue}
                     ref='result'
                 />
+                <RulesChecker estree={estree} />
             </div>
         )
     }
 
     updateCode = (code) => {
-        const estree = Esprima.parse(code)
-        this.setState({
-            code,
-            estree
-        })
+        let estree
+        try {
+            estree = Esprima.parse(code)
+        }
+        catch (err) {
+            estree = ['Error parsing JS code', err]
+        }
+        finally {
+            this.setState({
+                code,
+                estree
+            })
+        }
     }
 }
 

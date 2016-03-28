@@ -93,14 +93,21 @@ export function checkRulesObject(estreeNode, rulesObject) {
     }
 }
 
-function checkRules(estreeNode, rules) {
+function checkRules(estreeNode, rulesObject) {
     try {
-        const rulesObject = JSON.parse(rules)
         return checkRulesObject(estreeNode, rulesObject)
     }
     catch (e) {
-        console.log(e.message)
-        return false
+        return {error: e.message}
+    }
+}
+
+export function getRulesObject(rulesJSON) {
+    try {
+        return JSON.parse(rulesJSON)
+    }
+    catch (err) {
+        return {error: 'Invalid Rules JSON string'}
     }
 }
 

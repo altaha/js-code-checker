@@ -1,11 +1,68 @@
-.codemirror-container {
-    max-width: 720px;
-    border: 2px solid #ccc;
+.app-container {
+    margin: 10px;
 }
 
-.estree-display-textarea {
-    float: left;
+.codemirror-container {
+    display: inline-block;
+    vertical-align: top;
+}
+
+.codemirror-editor {
+    border: 2px solid #ccc;
+    max-width: 720px;
+    width: 400px;
+    position: relative;
+}
+
+.rules-input {
+    display: inline-block;
+    left: 20px;
+    position: relative;
+    vertical-align: top;
+}
+
+.rules-input-textarea {
+    border: 2px solid #ccc;
+    box-sizing: border-box;
+    height: 280px;
+    width: 350px;
+    padding: 0;
+    position: relative;
+}
+
+.rules-input-button {
+    width: 350px;
+    font-size: medium;
+    top: -5px;
+    left: 0px;
+    position: relative;
     display: block;
+}
+
+.results-display {
+    border: 2px solid red;
+    position: relative;
+    top: 10px;
+    width: 400px;
+}
+
+.results-display.passed {
+    border-color: lightgreen;
+}
+
+.results-display h3, .results-display h4 {
+    text-align: center;
+}
+
+.estree-display {
+    position: relative;
+    margin-top: 20px;
+}
+
+.estree-display textarea {
+    display: block;
+    top: 0px;
     width: 400px;
     height: 300px;
+    position: relative;
 }

@@ -4,45 +4,54 @@ import Codemirror from 'react-codemirror'
 import Esprima from 'esprima'
 import React from 'react'
 
-import RulesChecker from './RulesChecker'
+import EstreeDisplay from './EstreeDisplay'
+import ResultsDisplay from './ResultsDisplay'
+import RulesInput from './RulesInput'
 
 
 class MainController extends React.Component {
     state = {
         code: '',
-        estree: null
+        estree: {},
+        rules: {}
+    }
+
+    componentWillMount() {
+        this.updateCode(this.state.code)
     }
 
     render() {
         const options = {
             lineNumbers: true,
             readOnly: false,
-            mode: 'javascript',
-            theme: 'monokai'
+            mode: 'javascript'
         }
 
-        const estree = this.state.estree
-        const estreeValue = estree === null ?
-            '' : JSON.stringify(estree, null, 4)
-
         return (
-            <div>
+            <div className='main-container'>
                 <div className='codemirror-container' >
-                    <Codemirror
-                        onChange={this.updateCode}
-                        options={options}
-                        ref='codemirror'
-                        value={this.state.code}
-                    />
+                    <h3>
+                        Write JS Code
+                    </h3>
+                    <div className='codemirror-editor' >
+                        <Codemirror
+                            onChange={this.updateCode}
+                            options={options}
+                            ref='codemirror'
+                            value={this.state.code}
+                        />
+                    </div>
                 </div>
-                <p> Type code above and see parsed output below </p>
-                <textarea
-                    className='estree-display-textarea'
-                    disable={true}
-                    value={estreeValue}
-                    ref='result'
+                <RulesInput
+                    onUpdateRules={this.updateRules}
                 />
-                <RulesChecker estree={estree} />
+                <ResultsDisplay
+                    estree={this.state.estree}
+                    rules={this.state.rules}
+                />
+                <EstreeDisplay
+                    estree={this.state.estree}
+                />
             </div>
         )
     }
@@ -53,7 +62,8 @@ class MainController extends React.Component {
             estree = Esprima.parse(code)
         }
         catch (err) {
-            estree = ['Error parsing JS code', err]
+            const error = `Invalid JS Code: ${err.description} at line ${err.lineNumber}`
+            estree = {error}
         }
         finally {
             this.setState({
@@ -61,6 +71,10 @@ class MainController extends React.Component {
                 estree
             })
         }
+    }
+
+    updateRules = (rules) => {
+        this.setState({rules})
     }
 }
 

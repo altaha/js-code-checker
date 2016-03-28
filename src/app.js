@@ -7,10 +7,10 @@ import MainController from './MainController'
 export class App extends React.Component {
     render() {
         return (
-            <div>
-                <div>
-                    Simple React + Babel + Webpack
-                </div>
+            <div className='app-container'>
+                <h1>
+                    Javascript syntax rules checker
+                </h1>
                 <MainController />
             </div>
         )

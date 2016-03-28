@@ -13,32 +13,32 @@ describe('CheckRulesLib', () => {
     const testCode = 'function foo () { let i = 0; return true }' +
                  'for (;;) { if (true) {} } '
 
-    describe('findNodeWithType', () => {
+    describe('findNodeWithType Generator', () => {
         let estree
         beforeEach(() => {
             estree = esprima.parse(testCode)
         })
 
         it('Should return false if estree node is not defined', () => {
-            const result = findNodeWithType(null, 'whatever')
-            assert.isFalse(result)
+            const generator = findNodeWithType(null, 'whatever')
+            assert.isFalse(generator.next().value)
         })
 
         it('Should return false if requested node type does not exist in estree', () => {
-            const result = findNodeWithType(estree, 'WhileStatement')
-            assert.isFalse(result)
+            const generator = findNodeWithType(estree, 'WhileStatement')
+            assert.isFalse(generator.next().value)
         })
 
         it('Should find and return top level node type', () => {
             const nodeType = 'ForStatement'
-            const result = findNodeWithType(estree, nodeType)
-            assert.strictEqual(result.type, nodeType)
+            const generator = findNodeWithType(estree, nodeType)
+            assert.strictEqual(generator.next().value.type, nodeType)
         })
 
         it('Should find and return inner node type', () => {
             const nodeType = 'IfStatement'
-            const result = findNodeWithType(estree, nodeType)
-            assert.strictEqual(result.type, nodeType)
+            const generator = findNodeWithType(estree, nodeType)
+            assert.strictEqual(generator.next().value.type, nodeType)
         })
     })
 
@@ -84,7 +84,7 @@ describe('CheckRulesLib', () => {
             assert.isFalse(checkRulesObject(estree, rulesObject))
         })
 
-        it.skip('It can find the correct nested structure if multiple candidate nodes exist', () => {
+        it('It can find the correct nested structure if multiple candidate nodes exist', () => {
             const rulesObject = {
                 ForStatement: {IfStatement: true}
             }

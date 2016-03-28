@@ -1,3 +1,5 @@
+import 'babel-polyfill'
+
 function isArray(node) {
     return !!node && node.constructor === Array
 }
@@ -6,7 +8,7 @@ function isObject(node) {
     return !!node && node.constructor === Object
 }
 
-export function findNodeWithType(estreeNode, nodeType) {
+export function *findNodeWithType(estreeNode, nodeType) {
     if (!estreeNode) {
         return false
     }
@@ -18,7 +20,7 @@ export function findNodeWithType(estreeNode, nodeType) {
             continue
         }
         if (node.type === nodeType) {
-            return node
+            yield node
         }
 
         const children = Object.keys(node).reduce(
@@ -38,19 +40,26 @@ export function findNodeWithType(estreeNode, nodeType) {
 }
 
 export function checkHasNodeWithType(estreeNode, nodeType) {
-    return !!findNodeWithType(estreeNode, nodeType)
+    const generator = findNodeWithType(estreeNode, nodeType)
+    return !!generator.next().value
 }
 
 export function checkNotHasNodeWithType(estreeNode, nodeType) {
-    return !findNodeWithType(estreeNode, nodeType)
+    const generator = findNodeWithType(estreeNode, nodeType)
+    return !generator.next().value
 }
 
 export function checkHasNodeWithNestedRules(estreeNode, nodeType, nestedRules) {
-    const topNode = findNodeWithType(estreeNode, nodeType)
-    if (!topNode) {
-        return false
+    const generator = findNodeWithType(estreeNode, nodeType)
+    let nextNode = generator.next()
+    while (!nextNode.done) {
+        const topNode = nextNode.value
+        if (checkRulesObject(topNode, nestedRules)) {
+            return true
+        }
+        nextNode = generator.next()
     }
-    return checkRulesObject(topNode, nestedRules)
+    return nextNode.value
 }
 
 export function checkIndividualRule(estreeNode, nodeType, rule) {

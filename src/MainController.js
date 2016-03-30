@@ -1,47 +1,31 @@
-require('codemirror/mode/javascript/javascript')
-
-import Codemirror from 'react-codemirror'
-import Esprima from 'esprima'
 import React from 'react'
+import 'operative'
 
+import CodeInput from './CodeInput'
 import EstreeDisplay from './EstreeDisplay'
 import ResultsDisplay from './ResultsDisplay'
 import RulesInput from './RulesInput'
 
 
 class MainController extends React.Component {
-    state = {
-        code: '',
-        estree: {},
-        rules: {}
-    }
+    constructor() {
+        super()
 
-    componentWillMount() {
-        this.updateCode(this.state.code)
+        this.state = {
+            estree: {},
+            rules: {}
+        }
+        this.isParsingCode = false
+        this.codePending = false
+        this.worker = null
     }
 
     render() {
-        const options = {
-            lineNumbers: true,
-            readOnly: false,
-            mode: 'javascript'
-        }
-
         return (
             <div className='main-container'>
-                <div className='codemirror-container' >
-                    <h3>
-                        Write JS Code
-                    </h3>
-                    <div className='codemirror-editor' >
-                        <Codemirror
-                            onChange={this.updateCode}
-                            options={options}
-                            ref='codemirror'
-                            value={this.state.code}
-                        />
-                    </div>
-                </div>
+                <CodeInput
+                    onCodeChange={this.updateCode}
+                />
                 <RulesInput
                     onUpdateRules={this.updateRules}
                 />
@@ -56,25 +40,53 @@ class MainController extends React.Component {
         )
     }
 
-    updateCode = (code) => {
-        let estree
-        try {
-            estree = Esprima.parse(code)
-        }
-        catch (err) {
-            const error = `Invalid JS Code: ${err.description} at line ${err.lineNumber}`
-            estree = {error}
-        }
-        finally {
-            this.setState({
-                code,
-                estree
-            })
-        }
-    }
-
     updateRules = (rules) => {
         this.setState({rules})
+    }
+
+    updateCode = (code) => {
+        if (this.isParsingCode) {
+            this.codePending = code
+            return
+        }
+        this.isParsingCode = true
+        this.codePending = false
+
+        this.worker = operative({
+            parseCode
+        }, [
+            'esprima.js'
+        ])
+        this.worker.parseCode(code, this.onParseCompletion)
+    }
+
+    onParseCompletion = (estree) => {
+        this.isParsingCode = false
+        this.setState({
+            estree
+        })
+        if (this.worker) {
+            this.worker.terminate()
+            this.worker = null
+        }
+        if (this.codePending) {
+            this.updateCode(this.codePending)
+        }
+    }
+}
+
+
+function parseCode(code, doneCallback) {
+    let estree = {error: 'Whatever'}
+    try {
+        estree = esprima.parse(code)
+    }
+    catch (err) {
+        const error = `Invalid JS Code: ${err.description} at line ${err.lineNumber}`
+        estree = {error}
+    }
+    finally {
+        doneCallback(estree)
     }
 }
 

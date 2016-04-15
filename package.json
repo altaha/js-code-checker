@@ -3,7 +3,7 @@
   "version": "0.0.1",
   "description": "Simple project that uses a Javascript parser to inspect JS code and test rules",
   "scripts": {
-    "build": "webpack --progress --profile --colors --devtool source-map",
+    "build": "webpack --config webpack.config.prod.js --progress --profile --colors",
     "dev": "webpack-dev-server --progress --profile --colors --hot",
     "test": "node_modules/.bin/mocha --require babel-core/register -w"
   },

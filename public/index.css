@@ -66,3 +66,7 @@
     height: 300px;
     position: relative;
 }
+
+.footer {
+    color: rgb(128, 128, 128);
+}
